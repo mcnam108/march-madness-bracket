@@ -461,6 +461,140 @@ function FinalFour({ bracketState, onPick, onInfo }) {
   );
 }
 
+function Methodology() {
+  const sections = [
+    {
+      icon: "🏗️",
+      title: "How It Works",
+      accent: "#a5b4fc",
+      content: `This bracket predictor generates a composite "Power Score" for each of the 68 tournament teams, then simulates every head-to-head matchup by comparing those scores — with an additional style-of-play modifier applied on top. The model doesn't just pick the better team on paper; it accounts for how specific matchups play out based on each team's style, who's healthy, and how they're playing right now.`
+    },
+    {
+      icon: "📈",
+      title: "Factor 1: KenPom Ratings (~40% of Power Score)",
+      accent: "#22c55e",
+      content: `KenPom's Adjusted Efficiency Margin (AdjEM) is the single best predictor of tournament success. It measures how many points a team would outscore an average D1 team per 100 possessions, adjusted for opponent strength. We use the overall KenPom ranking as the heaviest-weighted input. A team ranked #1 in KenPom (like Duke) gets a much higher base score than a team ranked #150. Historically, 20 of the last 23 champions were ranked in the KenPom top 6 entering the tournament.`
+    },
+    {
+      icon: "📊",
+      title: "Factor 2: Four Factors — Offense & Defense (~25%)",
+      accent: "#4fa3e3",
+      content: `Beyond the overall KenPom number, we layer in Dean Oliver's "Four Factors" on both sides of the ball: Effective Field Goal % (shooting efficiency including the extra value of threes), Turnover Rate (how often you give it away or force giveaways), Offensive Rebound Rate (second-chance opportunities), and Free Throw Rate (getting to the line). We use each team's Adjusted Offensive and Adjusted Defensive efficiency ranks to capture this. A team with a #1 offense and #28 defense (like Illinois) will score differently than a team with #55 offense and #7 defense (like Nebraska), even if their overall KenPom ranks are close.`
+    },
+    {
+      icon: "🔥",
+      title: "Factor 3: Recency & Momentum (~20%)",
+      accent: "#f59e0b",
+      content: `March performance correlates strongly with how a team is playing right now — not how they looked in November. Each team is tagged as "hot," "neutral," or "cold" based on their last 8–10 games and conference tournament results. A team peaking in March (like Purdue winning the Big Ten Tournament) gets a positive boost, while a team in freefall (like BYU going under .500 after losing Richie Saunders) gets penalized. Conference tournament champions who rode momentum into Selection Sunday get extra credit.`
+    },
+    {
+      icon: "🏥",
+      title: "Factor 4: Player Availability (~15%)",
+      accent: "#ef4444",
+      content: `This is the wild card that pure ranking models miss. A key injury can swing a game by 5+ points. For each team, we flag any player with a significant injury and apply a penalty proportional to that player's share of the team's production. The penalty scales by status: "out" players get the full penalty, "doubtful" players get 80%, "questionable" gets 50%, and "probable" gets 15%. For example, UNC losing Caleb Wilson (19.8 PPG, season-ending surgery) applies a massive 30% impact penalty, while Duke losing Ngongba (questionable, role player) is a smaller hit. This data was sourced from injury reports as of March 18, 2026.`
+    },
+    {
+      icon: "♟️",
+      title: "Factor 5: Style Matchup Modifier (±Adjustment)",
+      accent: "#c084fc",
+      content: `This is what makes the model different from a pure power ranking. Instead of getting a fixed weight in the composite score, style operates as a matchup-specific modifier that adjusts the win probability after the base scores are calculated. Each team is tagged with a pace tier (fast/moderate/slow), offensive identity (e.g. three-point-heavy, paint-dominant, transition-heavy, ball-screen-heavy), defensive identity (e.g. zone, packline, press/trap, man-switch), and a special trait. When two teams meet, we check a matchup matrix for known style clashes. For example: a zone defense vs. a ball-screen-heavy offense (like South Florida vs. Michigan State) gives the zone team a boost, because ball-screen teams rely on driving lanes that zones collapse. A press/trap defense vs. a guard-driven, turnover-prone team gives the pressing team a boost. A slow-paced team facing a fast-paced favorite compresses the expected margin — fewer possessions means more variance and more upset potential.`
+    },
+    {
+      icon: "🧮",
+      title: "Win Probability Calculation",
+      accent: "#94a3b8",
+      content: `Once each team's Power Score is calculated, we compare the two teams in a matchup. The difference in scores is fed into a logistic function that converts it to a win probability. Roughly, every 1 point of composite difference translates to about 1.5 points of expected game margin. A 60/40 matchup means the favorite wins 6 times out of 10 — not a lock. The model also highlights when it predicts an upset (when the higher seed has the lower win probability), marked with a 🔥 icon. These tend to cluster in the 5v12, 6v11, 7v10, and 8v9 matchups where the seed gap is small but style or injury factors tip the scales.`
+    },
+    {
+      icon: "⚠️",
+      title: "Important Caveats",
+      accent: "#fbbf24",
+      content: `No model is perfect, and March Madness is famously unpredictable. This model uses pre-tournament data and cannot account for in-game adjustments, individual player performances that deviate from averages, referee tendencies, crowd effects, or the intangible "clutch factor." KenPom data was sourced from published rankings and reporting as of Selection Sunday (March 15, 2026). Injury statuses reflect reporting as of March 18, 2026 and may have changed. Style tags are derived from statistical profiles and scouting reports — they represent tendencies, not absolutes. Use this as a starting point, then layer in your own basketball instincts. The best brackets combine data with gut feel.`
+    },
+  ];
+
+  return (
+    <div style={{ maxWidth: "750px", margin: "0 auto" }}>
+      <div style={{ textAlign: "center", marginBottom: "24px" }}>
+        <h2 style={{ margin: 0, fontSize: "22px", fontWeight: 800, color: "#e2e2f0", fontFamily: "'Outfit', sans-serif", letterSpacing: "1px" }}>
+          How This Bracket Predictor Works
+        </h2>
+        <p style={{ margin: "6px 0 0", color: "#64748b", fontSize: "13px" }}>
+          A weighted composite model combining efficiency, style matchups, injuries, and momentum
+        </p>
+      </div>
+
+      <div style={{
+        background: "#0f0f1e",
+        border: "1px solid #2a2a3e",
+        borderRadius: "12px",
+        padding: "16px",
+        marginBottom: "20px",
+        display: "grid",
+        gridTemplateColumns: "repeat(5, 1fr)",
+        gap: "8px",
+        textAlign: "center",
+      }}>
+        {[
+          { label: "KenPom", pct: "40%", color: "#22c55e" },
+          { label: "Four Factors", pct: "25%", color: "#4fa3e3" },
+          { label: "Momentum", pct: "20%", color: "#f59e0b" },
+          { label: "Injuries", pct: "15%", color: "#ef4444" },
+          { label: "Style", pct: "±adj", color: "#c084fc" },
+        ].map((f, i) => (
+          <div key={i} style={{ padding: "10px 4px", background: "#1a1a2e", borderRadius: "8px", border: `1px solid ${f.color}33` }}>
+            <div style={{ fontSize: "18px", fontWeight: 800, color: f.color, fontFamily: "'JetBrains Mono', monospace" }}>{f.pct}</div>
+            <div style={{ fontSize: "10px", color: "#94a3b8", marginTop: "2px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>{f.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {sections.map((section, i) => (
+        <div key={i} style={{
+          background: "#0a0a14",
+          border: "1px solid #1a1a3e",
+          borderRadius: "12px",
+          padding: "18px",
+          marginBottom: "10px",
+          borderLeft: `3px solid ${section.accent}`,
+        }}>
+          <h3 style={{
+            margin: "0 0 8px",
+            fontSize: "14px",
+            fontWeight: 700,
+            color: section.accent,
+            fontFamily: "'Outfit', sans-serif",
+          }}>
+            {section.icon} {section.title}
+          </h3>
+          <p style={{
+            margin: 0,
+            fontSize: "13px",
+            lineHeight: "1.7",
+            color: "#cbd5e1",
+          }}>
+            {section.content}
+          </p>
+        </div>
+      ))}
+
+      <div style={{
+        background: "linear-gradient(135deg, #0f0f1e, #1a1a3e)",
+        border: "1px solid #2a2a3e",
+        borderRadius: "12px",
+        padding: "18px",
+        marginTop: "16px",
+        textAlign: "center",
+      }}>
+        <p style={{ margin: 0, fontSize: "12px", color: "#64748b", lineHeight: "1.6" }}>
+          Built for the 2026 NCAA Tournament. Data sourced from published KenPom rankings, ESPN, CBS Sports, Yahoo Sports, SI, and team injury reports as of March 18, 2026.
+          Style profiles derived from pace, 3PA rate, steal rate, block rate, and defensive scheme reporting.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [bracketState, setBracketState] = useState({
     East: { r1: {}, r2: {}, r3: {}, r4: {} },
@@ -473,6 +607,7 @@ export default function App() {
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [activeRegion, setActiveRegion] = useState("East");
   const [showFinalFour, setShowFinalFour] = useState(false);
+  const [showMethodology, setShowMethodology] = useState(false);
 
   const clearDownstream = useCallback((state, region, round, index) => {
     const newState = JSON.parse(JSON.stringify(state));
@@ -596,19 +731,19 @@ export default function App() {
         {Object.keys(BRACKET).map(region => (
           <button
             key={region}
-            onClick={() => { setActiveRegion(region); setShowFinalFour(false); }}
+            onClick={() => { setActiveRegion(region); setShowFinalFour(false); setShowMethodology(false); }}
             style={{
               ...styles.tab,
-              background: activeRegion === region && !showFinalFour ? REGION_COLORS[region].bg : "transparent",
-              color: activeRegion === region && !showFinalFour ? REGION_COLORS[region].accent : "#64748b",
-              borderBottom: activeRegion === region && !showFinalFour ? `2px solid ${REGION_COLORS[region].accent}` : "2px solid transparent",
+              background: activeRegion === region && !showFinalFour && !showMethodology ? REGION_COLORS[region].bg : "transparent",
+              color: activeRegion === region && !showFinalFour && !showMethodology ? REGION_COLORS[region].accent : "#64748b",
+              borderBottom: activeRegion === region && !showFinalFour && !showMethodology ? `2px solid ${REGION_COLORS[region].accent}` : "2px solid transparent",
             }}
           >
             {region}
           </button>
         ))}
         <button
-          onClick={() => setShowFinalFour(true)}
+          onClick={() => { setShowFinalFour(true); setShowMethodology(false); }}
           style={{
             ...styles.tab,
             background: showFinalFour ? "#2a1a0a" : "transparent",
@@ -618,14 +753,29 @@ export default function App() {
         >
           🏆 Final Four
         </button>
+        <button
+          onClick={() => { setShowMethodology(true); setShowFinalFour(false); }}
+          style={{
+            ...styles.tab,
+            background: showMethodology ? "#1a1a3e" : "transparent",
+            color: showMethodology ? "#a5b4fc" : "#64748b",
+            borderBottom: showMethodology ? "2px solid #a5b4fc" : "2px solid transparent",
+          }}
+        >
+          📊 Methodology
+        </button>
       </div>
 
-      <div style={styles.instructions}>
-        <span style={{ color: "#94a3b8" }}>💡</span> Click a team to pick them as the winner. Click <span style={{ color: "#a5b4fc" }}>ℹ</span> to see detailed stats, injuries, and style profile. Highlighted teams are model-recommended.
-      </div>
+      {!showMethodology && (
+        <div style={styles.instructions}>
+          <span style={{ color: "#94a3b8" }}>💡</span> Click a team to pick them as the winner. Click <span style={{ color: "#a5b4fc" }}>ℹ</span> to see detailed stats, injuries, and style profile. Highlighted teams are model-recommended.
+        </div>
+      )}
 
       <main style={styles.main}>
-        {showFinalFour ? (
+        {showMethodology ? (
+          <Methodology />
+        ) : showFinalFour ? (
           <FinalFour bracketState={bracketState} onPick={handlePick} onInfo={setSelectedTeam} />
         ) : (
           <RegionBracket
